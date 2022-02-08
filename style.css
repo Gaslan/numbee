@@ -68,6 +68,10 @@ header .n-icon{
     justify-content: center;
 }
 
+.main .row.row-error{
+    animation: shake 900ms ease 0s 1 normal forwards;
+}
+
 .main .col{
     width: var(--num-dimension);
     height: var(--num-dimension);
@@ -87,11 +91,37 @@ header .n-icon{
     font-weight: 700;
     line-height: 24px;
     user-select: none;
+    /* transition: background-color ease 1s, border-color ease 1s; */
+}
+
+.main .col .num.controlling{
+    transition: background-color ease 1s, border-color ease 1s;
+}
+
+.main .col:nth-child(1) .num.controlling{
+    transition-delay: 0;
+}
+
+.main .col:nth-child(2) .num.controlling{
+    transition-delay: .6s;
+} 
+
+.main .col:nth-child(3) .num.controlling{
+    transition-delay: 1.2s;
+}  
+
+.main .col:nth-child(4) .num.controlling{
+    transition-delay: 1.8s;
+} 
+
+.main .col:nth-child(5) .num.controlling{
+    transition-delay: 2.4s;
 }
 
 
 .main .num.filled{
     border-color: #949698;
+    transition-delay: 0;
 }
 
 .main .num.same{
@@ -519,3 +549,33 @@ body.dark .num-pad button.not-exist{
     background-color: #6b6b6b;
     color: #fff;
 }
+
+
+
+@keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+  
+    10%,
+    30%,
+    50%,
+    70% {
+      transform: translateX(-5px);
+    }
+  
+    20%,
+    40%,
+    60% {
+      transform: translateX(5px);
+    }
+  
+    80% {
+      transform: translateX(3px);
+    }
+  
+    90% {
+      transform: translateX(-3px);
+    }
+  }

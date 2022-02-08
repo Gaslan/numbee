@@ -9,6 +9,11 @@ function GameUI() {
 }
 
 GameUI.prototype.init = function init() {
+    const darkTheme = localStorage.getItem('dark-theme')
+    if (darkTheme && darkTheme == 'true') {
+        document.body.classList.add('dark')
+    }
+
     document.querySelector('#settings').addEventListener('click', function() {
         document.querySelector('#modal-panel-settings').classList.toggle('open')
     })
@@ -26,6 +31,9 @@ GameUI.prototype.init = function init() {
     const darkModeBtn = document.querySelector('#settings-btn-dark-mode')
     darkModeBtn.addEventListener('click', function() {
         document.querySelector('body').classList.toggle('dark')
+        const darkTheme = document.querySelector('body').classList.contains('dark')
+
+        localStorage.setItem('dark-theme', darkTheme)
     })
     
 
@@ -172,13 +180,21 @@ GameBase.prototype.init = function init() {
         _this.activeCol.col--
     })
 
+    function shakeRow(rowIndex) {
+        const row = document.querySelector(`.main .row[data-row="${rowIndex}"]`)
+        row.classList.add('row-error')
+        setTimeout(function() {
+            row.classList.remove('row-error')
+        }, 1000)
+    }
+
     document.querySelector('#enter-btn').addEventListener('click', function() {
         if (!_this.isGameActive()) {
             return
         }
         if (_this.activeCol.col < _this.colCount) {
-            console.log('Az sayı var...')
             _this.ui.createNotifyItem('Az sayı var')
+            shakeRow(_this.activeCol.row)
             return
         }
         var activeCols = _this.mainPanel.querySelectorAll(`div[data-row="${_this.activeCol.row}"] .col`)
@@ -188,7 +204,16 @@ GameBase.prototype.init = function init() {
             num += activeCols[i].innerText
         }
 
-        _this.controlNumber(num)
+        for (let i = 0; i < activeCols.length; i++) {
+            activeCols[i].querySelector('.num').classList.add('controlling')
+        }
+
+        _this.controlNumber(num, function() {
+            for (let i = 0; i < activeCols.length; i++) {
+                activeCols[i].querySelector('.num').classList.add('controlling')
+            }
+        })
+
         
         _this.activeCol.row++
         _this.activeCol.col = 0
@@ -277,7 +302,7 @@ GameBase.prototype.createNumPad = function createNumPad() {
 
 
 
-GameBase.prototype.controlNumber = function controlNumber(guess) {
+GameBase.prototype.controlNumber = function controlNumber(guess, callback) {
 
     const guessStatusArr = Array(this.colCount).fill('0')
     const targetNumberChars = this.targetNumber.split('')
@@ -315,10 +340,16 @@ GameBase.prototype.controlNumber = function controlNumber(guess) {
 
     this.ui.specifyRowStatus(this.activeCol.row, guessStatusArr, guess)
 
+
+
     if (sameCharsIndexes.length == this.colCount) {
         this.gameStatus = 'finished'
-        this.ui.createNotifyItem('Kazandın...')
+        setTimeout(() => {
+            this.ui.createNotifyItem('Kazandın...')
+        }, 3000)
     }
+
+    callback()
 }
 
 window.onload = function() {
