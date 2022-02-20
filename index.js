@@ -1,31 +1,162 @@
-function GameUI() {
-    this.numPadButtons = [
+function NumPad() {
+    this.numPadButtons = {}
+    this.numPad = document.querySelector('section.num-pad')
+}
+
+NumPad.prototype.editNumPadButtonColor = function editNumPadButtonColor(numPadBtn, result) {
+    if (numPadBtn.classList.contains('same')) {
+        return
+    }
+
+    if (numPadBtn.classList.contains('wrong-place')) {
+        if (result == 's') {
+            numPadBtn.classList.remove('wrong-place')
+            numPadBtn.classList.add('same')
+        }
+        return
+    }
+    
+    if (numPadBtn.classList.contains('not-exist')) {
+        if (result == 's') {
+            numPadBtn.classList.remove('not-exist')
+            numPadBtn.classList.add('same')
+        }
+        if (result == 'w') {
+            numPadBtn.classList.remove('not-exist')
+            numPadBtn.classList.add('wrong-place')
+        }
+        return
+    }
+
+    if (result == '0') {
+        numPadBtn.classList.add('not-exist')
+        return
+    }
+
+    if (result == 'w') {
+        numPadBtn.classList.add('wrong-place')
+        return
+    }
+
+    if (result == 's') {
+        numPadBtn.classList.add('same')
+        return
+    }
+}
+
+NumPad.prototype.editNumPadColors = function editNumPadColors(guessStatusArr) {
+    var _this = this
+    guessStatusArr.forEach(function(x) {
+        const num = _this.numPadButtons['btn' + x.char]
+        const result = x.result
+        _this.editNumPadButtonColor(num, result)
+    })
+}
+
+NumPad.prototype.createNumPad = function createNumPad(game) {
+    const numPadChars = [
         ['1', '2', '3'],
         ['4', '5', '6'],
         ['7', '8', '9'],
         ['Enter', '0', '←']
     ]
 
+    numPadChars.forEach(r => {
+        const row = document.createElement('div')
+        row.classList.add('row')
+
+        r.forEach(val => {
+            const button = document.createElement('button')
+            if (!isNaN(val)) {
+                button.innerText = val
+                button.setAttribute('data-val', val)
+                this.numPadButtons['btn' + val] = button
+            } else if (val == 'Enter') {
+                button.innerText = val
+                button.setAttribute('id', 'enter-btn')
+                this.numPadButtons['btnEnter'] = button
+            } else if (val == '←') {
+                button.innerHTML = '<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><line x1="18" y1="9" x2="12" y2="15"></line><line x1="12" y1="9" x2="18" y2="15"></line></svg>'
+                button.setAttribute('id', 'delete-btn')
+                this.numPadButtons['btnDelete'] = button
+            }
+
+            const col = document.createElement('div')
+            col.classList.add('col')
+            col.appendChild(button)
+            row.appendChild(col)
+        })
+        this.numPad.appendChild(row)
+    })
+}
+
+function GameUI() {
+    this.settingsBtn = document.querySelector('#settings')
+    this.helpBtn = document.querySelector('#help-btn')
+    this.subPageSettings = document.querySelector('#sub-page-settings')
+    this.subPageHelp = document.querySelector('#sub-page-help')
+    this.statisticsBtn = document.querySelector('#statistics-btn')
+    this.statisticsModal = document.querySelector('#statistics-modal')
+    this.mainPanel = document.querySelector('section.main')
+    this.notify = document.querySelector('.notify')
+
+    this.numPad = new NumPad()
+    this.numPad.createNumPad()
 }
 
 GameUI.prototype.init = function init() {
+    const _this = this
     const darkTheme = localStorage.getItem('dark-theme')
     if (darkTheme && darkTheme == 'true') {
         document.body.classList.add('dark')
     }
 
-    document.querySelector('#settings').addEventListener('click', function() {
-        document.querySelector('#modal-panel-settings').classList.toggle('open')
+    this.settingsBtn.addEventListener('click', function() {
+        _this.subPageSettings.classList.toggle('open')
     })
 
     document.querySelector('#settings-close').addEventListener('click', function() {
-        document.querySelector('#modal-panel-settings').classList.add('closing')
+        _this.subPageSettings.classList.add('closing')
         setTimeout(function() {
-            document.querySelector('#modal-panel-settings').classList.remove('closing')
+            _this.subPageSettings.classList.remove('closing')
         }, 150)
         setTimeout(function() {
-            document.querySelector('#modal-panel-settings').classList.toggle('open')
+            _this.subPageSettings.classList.toggle('open')
         }, 150)
+    })
+
+    this.helpBtn.addEventListener('click', function() {
+        _this.subPageHelp.classList.toggle('open')
+    })
+
+    document.querySelector('#help-close').addEventListener('click', function() {
+        _this.subPageHelp.classList.add('closing')
+        setTimeout(function() {
+            _this.subPageHelp.classList.remove('closing')
+        }, 150)
+        setTimeout(function() {
+            _this.subPageHelp.classList.toggle('open')
+        }, 150)
+    })
+
+    this.statisticsBtn.addEventListener('click', function() {
+        let stats = localStorage.getItem('statistics')
+        stats = JSON.parse(stats)
+        _this.createGuessDistribution(stats)
+        _this.createStatsPanels(stats)
+        _this.statisticsModal.classList.toggle('open')
+    })
+
+    document.querySelector('#statistics-modal .close-btn').addEventListener('click', function(e) {
+        _this.statisticsModal.classList.remove('open')
+    })
+
+    this.statisticsModal.addEventListener('click', function(e) {
+        if (this != e.target) {
+            return
+        }
+        
+        _this.statisticsModal.classList.remove('open')
     })
 
     const darkModeBtn = document.querySelector('#settings-btn-dark-mode')
@@ -44,105 +175,164 @@ GameUI.prototype.init = function init() {
             check.classList.toggle('checked')
         })
     }
-
-    
-}
-
-GameUI.prototype.mainPanel = function mainPanel() {
-    return document.querySelector('section.main')
-}
-
-GameUI.prototype.numPad = function numPad() {
-    return document.querySelector('section.num-pad')
 }
 
 GameUI.prototype.createNotifyItem = function createNotifyItem(message) {
-    const notify = document.querySelector('.notify')
+    const _this = this
     const notifyItem = document.createElement('div')
     notifyItem.classList.add('notify-item')
     notifyItem.innerText = message
-    notify.insertAdjacentElement('afterbegin', notifyItem)
-    // notify.appendChild(notifyItem)
+    this.notify.insertAdjacentElement('afterbegin', notifyItem)
     setTimeout(function() {
-        notify.removeChild(notifyItem)
+        _this.notify.removeChild(notifyItem)
     }, 1100)
 }
 
-GameUI.prototype.specifySameChars = function specifySameChars(currentRow, charIndexes) {
-    const row = this.mainPanel().querySelector(`div[data-row="${currentRow}"]`)
-    charIndexes.forEach(x => {
-        row.querySelector(`div[data-col="${x}"] .num`).classList.add('same')
-    })
-}
-
-GameUI.prototype.specifyRowStatus = function specifyRowStatus(currentRow, guessStatusArr, guess) {
-    const row = this.mainPanel().querySelector(`div[data-row="${currentRow}"]`)
-    const numPad = this.numPad()
+GameUI.prototype.specifyRowStatus = function specifyRowStatus(currentRow, guessStatusArr) {
+    const row = this.mainPanel.querySelector(`div[data-row="${currentRow}"]`)
     guessStatusArr.forEach((x, i) => {
         const col = row.querySelector(`div[data-col="${i}"] .num`)
-        if (x == '0') {
+        if (x.result == '0') {
             col.classList.add('not-exist')
         }
-        if (x == 'w') {
+        if (x.result == 'w') {
             col.classList.add('wrong-place')
         }
-        if (x == 's') {
+        if (x.result == 's') {
             col.classList.add('same')
         }
     })
 
-    guessStatusArr.forEach((x, i) => {
-        const num = numPad.querySelector(`button[data-val="${guess[i]}"]`)
-        
-        if (num.classList.contains('same')) {
-            return
+    this.numPad.editNumPadColors(guessStatusArr)  
+}
+
+
+GameUI.prototype.createMainPanel = function createMainPanel(rowCount, colCount) {
+
+    var mainPanelInner = document.createElement('div')
+    mainPanelInner.classList.add('main-inner')
+
+    var row = document.createElement('div')
+    row.classList.add('row')
+
+    var col = document.createElement('div')
+    col.classList.add('col')
+
+    var num = document.createElement('div')
+    num.classList.add('num')
+
+    col.appendChild(num)
+
+    for (let i = 0; i < colCount; i++) {
+        let colCloned = col.cloneNode(true)
+        colCloned.setAttribute('data-col', i)
+        row.appendChild(colCloned)
+    }
+
+    for (let i = 0; i < rowCount; i++) {
+        let rowCloned = row.cloneNode(true)
+        rowCloned.setAttribute('data-row', i)
+        mainPanelInner.appendChild(rowCloned)
+    }
+    this.mainPanel.appendChild(mainPanelInner)
+}
+
+GameUI.prototype.createGuessDistribution = function createGuessDistribution(stats) {
+    const container = document.createElement('div')
+    container.classList.add('guess-distribution-container')
+
+    for (const key in stats.guesses) {
+
+        if (key == 'fail') {
+            continue
         }
 
-        if (num.classList.contains('wrong-place')) {
-            if (x == 's') {
-                num.classList.remove('wrong-place')
-                num.classList.add('same')
-            }
-            return
-        }
-        
-        if (num.classList.contains('not-exist')) {
-            if (x == 's') {
-                num.classList.remove('not-exist')
-                num.classList.add('same')
-            }
-            if (x == 'w') {
-                num.classList.remove('not-exist')
-                num.classList.add('wrong-place')
-            }
-            return
+        const count = stats.guesses[key]
+        const countPersentage = Math.round(count / stats.played * 100)
+        let width = 7
+        if (countPersentage > 7) {
+            width = countPersentage
         }
 
-        if (x == '0') {
-            num.classList.add('not-exist')
-        }
-        if (x == 'w') {
-            num.classList.add('wrong-place')
-        }
-        if (x == 's') {
-            num.classList.add('same')
-        }
-    })
+        const row = document.createElement('div')
+        row.classList.add('guess-distribution-row')
+
+        const guessCount = document.createElement('div')
+        guessCount.classList.add('guess-distribution-guess-count')
+        guessCount.innerText = key
+
+        const graph = document.createElement('div')
+        graph.classList.add('guess-distribution-graph')
+
+        const graphBar = document.createElement('div')
+        graphBar.classList.add('guess-distribution-graph-bar')
+        graphBar.style.width = width + '%'
+
+        const graphBarValue = document.createElement('div')
+        graphBarValue.classList.add('guess-distribution-graph-bar-value')
+        graphBarValue.innerText = count
+
+        graphBar.appendChild(graphBarValue)
+        graph.appendChild(graphBar)
+        row.appendChild(guessCount)
+        row.appendChild(graph)
+        container.appendChild(row)
+    }
+    document.querySelector('#guess-distribution').innerHTML = ''
+    document.querySelector('#guess-distribution').appendChild(container)
+}
+
+GameUI.prototype.createStatsPanels = function createStatsPanels(stats) {
+    
+    const container = document.createElement('div')
+    container.classList.add('stats-panel-container')
+
+    const panels = {
+        played: 'Played',
+        winPersentage: 'Win %',
+        streak: 'Current Streak',
+        maxStreak: 'Max Streak'
+    }
+
+    for (const key in panels) {
+        const panel = panels[key]
+
+        let item = document.createElement('div')
+        item.classList.add('stats-panel-item')
+        item.id = 'stats-' + key
+        
+        let itemValue = document.createElement('div')
+        itemValue.classList.add('stats-panel-item-value')
+        itemValue.innerText = stats[key]
+        
+        let itemDetail = document.createElement('div')
+        itemDetail.classList.add('stats-panel-item-detail')
+        itemDetail.innerText = panel
+
+        item.appendChild(itemValue)
+        item.appendChild(itemDetail)
+        container.appendChild(item)
+    }
+    document.querySelector('#stats-panel').innerHTML = ''
+    document.querySelector('#stats-panel').appendChild(container)
 }
 
 
 
-function GameBase(ui) {
+function Game(ui) {
     this.ui = ui
-    this.mainPanel = ui.mainPanel()
-    this.numPad = ui.numPad()
+    this.mainPanel = ui.mainPanel
+    this.numPad = ui.numPad.numPad
     this.activeCol = {
         row: 0,
         col: 0
     }
     this.rowCount = 6
     this.colCount = 5
-    this.targetNumber = getRandomInt(Math.pow(10, this.colCount)) + ''
+
+    const min = Math.pow(10, this.colCount - 1)
+    const max = Math.pow(10, this.colCount) - 1
+    this.targetNumber = getRandomInt(min, max) + ''
     console.log(this.targetNumber)
 
     this.targetNumberObj = this.createNumberObj(this.targetNumber)
@@ -151,7 +341,7 @@ function GameBase(ui) {
     this.gameStatus = 'started'
 }
 
-GameBase.prototype.createNumberObj = function createNumberObj(num) {
+Game.prototype.createNumberObj = function createNumberObj(num) {
     return num.split('').reduce((o, c) => {
         if (!o[c]) {
             o[c] = 0
@@ -161,24 +351,29 @@ GameBase.prototype.createNumberObj = function createNumberObj(num) {
     }, {})
 }
 
-GameBase.prototype.init = function init() {
+Game.prototype.init = function init() {
     this.ui.init()
-    this.createMainPanel()
-    this.createNumPad()
+    this.ui.createMainPanel(this.rowCount, this.colCount)
     _this = this
 
-    document.querySelector('#delete-btn').addEventListener('click', function() {
+    function handleNumPadButtonClicked() {
         if (!_this.isGameActive()) {
             return
         }
-        if (_this.activeCol.col == 0) {
+        if (_this.activeCol.col == _this.colCount) {
             return
         }
-        var active = _this.mainPanel.querySelector(`div[data-row="${_this.activeCol.row}"] div[data-col="${_this.activeCol.col - 1}"] .num`)
-        active.innerText = ''
-        active.classList.remove('filled')
-        _this.activeCol.col--
-    })
+        var active = document.querySelector(`section.main div[data-row="${_this.activeCol.row}"] div[data-col="${_this.activeCol.col}"] .num`)
+        active.innerText = this.getAttribute('data-val')
+        active.classList.add('filled')
+        if (_this.activeCol.col < _this.colCount) {
+            _this.activeCol.col++
+        }
+    }
+
+    for (let i = 0; i <= 9; i++) {
+        this.ui.numPad.numPadButtons['btn' + i].addEventListener('click', handleNumPadButtonClicked)
+    }
 
     function shakeRow(rowIndex) {
         const row = document.querySelector(`.main .row[data-row="${rowIndex}"]`)
@@ -188,7 +383,7 @@ GameBase.prototype.init = function init() {
         }, 1000)
     }
 
-    document.querySelector('#enter-btn').addEventListener('click', function() {
+    this.ui.numPad.numPadButtons['btnEnter'].addEventListener('click', function() {
         if (!_this.isGameActive()) {
             return
         }
@@ -214,99 +409,91 @@ GameBase.prototype.init = function init() {
             }
         })
 
-        
         _this.activeCol.row++
         _this.activeCol.col = 0
 
-        
         if (_this.activeCol.row == this.rowCount) {
             this.gameStatus = 'finished'
         }
     })
+
+    this.ui.numPad.numPadButtons['btnDelete'].addEventListener('click', function() {
+        if (!_this.isGameActive()) {
+            return
+        }
+        if (_this.activeCol.col == 0) {
+            return
+        }
+        var active = _this.mainPanel.querySelector(`div[data-row="${_this.activeCol.row}"] div[data-col="${_this.activeCol.col - 1}"] .num`)
+        active.innerText = ''
+        active.classList.remove('filled')
+        _this.activeCol.col--
+    })
+
+    
+    if (!localStorage.getItem('statistics')) {
+        localStorage.setItem('statistics', JSON.stringify({
+            played: 0,
+            won: 0,
+            streak: 0,
+            maxStreak: 0,
+            winPersentage: 0,
+            guesses:{
+                "1": 0,
+                "2": 0,
+                "3": 0,
+                "4": 0,
+                "5": 0,
+                "6": 0,
+                "fail": 0
+            }
+        }))
+    }
 }
 
-GameBase.prototype.isGameActive = function isGameActive() {
+Game.prototype.updateGameStatus = function updateGameStatus(status, rowCount) {
+    let stats = localStorage.getItem('statistics')
+    stats = JSON.parse(stats)
+
+    if (status == 'win') {
+        stats.played++
+        stats.won++
+        stats.streak++
+        if (stats.streak > stats.maxStreak) {
+            stats.maxStreak = stats.streak
+        }
+        stats.winPersentage = Math.round(stats.won / stats.played * 100)
+        stats.guesses[rowCount + 1]++
+    }
+
+    if (status == 'fail') {
+        stats.played++
+        stats.streak = 0
+        stats.winPersentage = Math.round(stats.won / stats.played * 100)
+        stats.guesses['fail']++
+    }
+
+    this.ui.createGuessDistribution(stats)
+    this.ui.createStatsPanels(stats)
+
+    localStorage.setItem('statistics', JSON.stringify(stats))
+}
+
+Game.prototype.isGameActive = function isGameActive() {
     return this.gameStatus == 'started'
 }
 
-GameBase.prototype.createMainPanel = function createMainPanel() {
+Game.prototype.controlNumber = function controlNumber(guess, callback) {
 
-    var row = document.createElement('div')
-    row.classList.add('row')
-
-    var col = document.createElement('div')
-    col.classList.add('col')
-
-    var num = document.createElement('div')
-    num.classList.add('num')
-
-    col.appendChild(num)
-
-    for (let i = 0; i < this.colCount; i++) {
-        let colCloned = col.cloneNode(true)
-        colCloned.setAttribute('data-col', i)
-        row.appendChild(colCloned)
-    }
-
-    for (let i = 0; i < this.rowCount; i++) {
-        let rowCloned = row.cloneNode(true)
-        rowCloned.setAttribute('data-row', i)
-        this.mainPanel.appendChild(rowCloned)
-    }
-}
-
-GameBase.prototype.createNumPad = function createNumPad() {
-    var _this = this
-    var row = document.createElement('div')
-    row.classList.add('row')
-
-    var col = document.createElement('div')
-    col.classList.add('col')
-
-    this.ui.numPadButtons.forEach(r => {
-        let rowCloned = row.cloneNode(true)
-        r.forEach(val => {
-            const button = document.createElement('button')
-            if (!isNaN(val)) {
-                button.setAttribute('data-val', val)
-                button.innerText = val
-                button.addEventListener('click', function() {
-                    if (!_this.isGameActive()) {
-                        return
-                    }
-                    if (_this.activeCol.col == _this.colCount) {
-                        return
-                    }
-                    var active = _this.mainPanel.querySelector(`div[data-row="${_this.activeCol.row}"] div[data-col="${_this.activeCol.col}"] .num`)
-                    active.innerText = this.getAttribute('data-val')
-                    active.classList.add('filled')
-                    if (_this.activeCol.col < _this.colCount) {
-                        _this.activeCol.col++
-                    }
-                })
-            } else if (val == 'Enter') {
-                button.innerText = val
-                button.setAttribute('id', 'enter-btn')
-            } else if (val == '←') {
-                button.innerHTML = '<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><line x1="18" y1="9" x2="12" y2="15"></line><line x1="12" y1="9" x2="18" y2="15"></line></svg>'
-                button.setAttribute('id', 'delete-btn')
-            }
-
-            const colCloned = col.cloneNode(true)
-            colCloned.appendChild(button)
-            rowCloned.appendChild(colCloned)
-        })
-        this.numPad.appendChild(rowCloned)
-    })
-}
-
-
-
-GameBase.prototype.controlNumber = function controlNumber(guess, callback) {
-
-    const guessStatusArr = Array(this.colCount).fill('0')
     const targetNumberChars = this.targetNumber.split('')
     const guessChars = guess.split('')
+
+    const guessStatusArr = guessChars.map(c => {
+        return {
+            char: c,
+            result: '0'
+        }
+    })
 
     guessChars.forEach((c, i) => {
         if (c == targetNumberChars[i]) {
@@ -335,18 +522,34 @@ GameBase.prototype.controlNumber = function controlNumber(guess, callback) {
         }
     })
 
-    sameCharsIndexes.forEach(c => guessStatusArr[c] = 's')
-    wrongPlaceCharsIndexes.forEach(c => guessStatusArr[c] = 'w')
+    sameCharsIndexes.forEach(c => guessStatusArr[c].result = 's')
+    wrongPlaceCharsIndexes.forEach(c => guessStatusArr[c].result = 'w')
 
-    this.ui.specifyRowStatus(this.activeCol.row, guessStatusArr, guess)
-
-
+    this.ui.specifyRowStatus(this.activeCol.row, guessStatusArr)
 
     if (sameCharsIndexes.length == this.colCount) {
         this.gameStatus = 'finished'
+        this.updateGameStatus('win', this.activeCol.row)
         setTimeout(() => {
             this.ui.createNotifyItem('Kazandın...')
         }, 3000)
+        setTimeout(() => {
+            document.querySelector('#statistics-modal').classList.toggle('open')
+        }, 4000)
+        
+        callback()
+        return
+    }
+
+    if (this.activeCol.row + 1 == this.rowCount) {
+        this.gameStatus = 'finished'
+        this.updateGameStatus('fail', this.activeCol.row)
+        setTimeout(() => {
+            this.ui.createNotifyItem('Kaybettin...' + ' ' + this.targetNumber)
+        }, 3000)
+        setTimeout(() => {
+            document.querySelector('#statistics-modal').classList.toggle('open')
+        }, 4000)
     }
 
     callback()
@@ -354,10 +557,10 @@ GameBase.prototype.controlNumber = function controlNumber(guess, callback) {
 
 window.onload = function() {
     var UI = new GameUI()
-    var game = new GameBase(UI)
+    var game = new Game(UI)
     game.init()
 }
 
-function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
-  }
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min)
+}

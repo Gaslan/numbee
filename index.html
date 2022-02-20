@@ -20,11 +20,11 @@
 <body>
   <div class="game">
     <header>
-      <div class="n-icon">
+      <div class="n-icon" id="help-btn">
         <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
       </div>
       <div class="n-title">Numbee</div>
-      <div class="n-icon">
+      <div class="n-icon" id="statistics-btn">
         <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
       </div>
       <div class="n-icon" id="settings">
@@ -37,15 +37,16 @@
     <section class="num-pad"></section>
 
     <div class="notify"></div>
-    <div class="modal-panel" id="modal-panel-settings">
-      <div class="modal-title">
+
+    <div class="sub-page" id="sub-page-settings">
+      <div class="sub-page-title">
         <h2>Settings</h2>
         <button class="close-btn" id="settings-close">
           <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
-      <div class="modal-body">
-        <div class="modal-row">
+      <div class="sub-page-body">
+        <div class="sub-page-row">
           <div class="settings-detail">Dark Mode</div>
           <div class="settings-control">
             <div class="check" id="settings-btn-dark-mode">
@@ -53,7 +54,7 @@
             </div>
           </div>
         </div>
-        <div class="modal-row">
+        <div class="sub-page-row">
           <div class="settings-detail">Row Count</div>
           <div class="settings-control">
             <div class="number-input-group">
@@ -68,6 +69,101 @@
         </div>
       </div>
     </div>
+
+    <div class="modal" id="statistics-modal">
+      <div class="modal-panel stats">
+        <div class="modal-header">
+          <h2 class="modal-title">Statistics</h2>
+          <button class="close-btn" id="settings-close">
+            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+        <div id="stats-panel"></div>
+        <h3>Guess Distribution</h3>
+        <div id="guess-distribution"></div>
+      </div>
+    </div>
+
+    <div class="sub-page" id="sub-page-help">
+      <div class="sub-page-title">
+        <h2>How To Play</h2>
+        <button class="close-btn" id="help-close">
+          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="sub-page-body">
+        <div class="help">
+          <p>Guess the <strong>NUMBEE</strong> in six tries.</p>
+          <p>Each guess must be a valid five-digit number. Hit the enter button to submit.</p>
+          <p>After each guess, the color of the tiles will change to show how close your guess was to the number.</p>
+          <div class="examples">
+            <p><strong>Examples</strong></p>
+            <div class="examples-main">
+              <div class="examples-row">
+                <div class="examples-col">
+                  <div class="examples-num same">6</div>
+                </div>
+                <div class="examples-col">
+                  <div class="examples-num">3</div>
+                </div>
+                <div class="examples-col">
+                  <div class="examples-num">9</div>
+                </div>
+                <div class="examples-col">
+                  <div class="examples-num">0</div>
+                </div>
+                <div class="examples-col">
+                  <div class="examples-num">1</div>
+                </div>
+              </div>
+              <p>The number <strong>6</strong> is in the number and in the correct spot.</p>
+            </div>
+            <div class="examples-main">
+              <div class="examples-row">
+                <div class="examples-col">
+                  <div class="examples-num">8</div>
+                </div>
+                <div class="examples-col">
+                  <div class="examples-num wrong-place">9</div>
+                </div>
+                <div class="examples-col">
+                  <div class="examples-num">3</div>
+                </div>
+                <div class="examples-col">
+                  <div class="examples-num">1</div>
+                </div>
+                <div class="examples-col">
+                  <div class="examples-num">7</div>
+                </div>
+              </div>
+              <p>The number <strong>9</strong> is in the number but in the wrong spot.</p>
+            </div>
+            <div class="examples-main">
+              <div class="examples-row">
+                <div class="examples-col">
+                  <div class="examples-num">6</div>
+                </div>
+                <div class="examples-col">
+                  <div class="examples-num">0</div>
+                </div>
+                <div class="examples-col">
+                  <div class="examples-num">5</div>
+                </div>
+                <div class="examples-col">
+                  <div class="examples-num">8</div>
+                </div>
+                <div class="examples-col">
+                  <div class="examples-num not-exist">2</div>
+                </div>
+              </div>
+              <p>The number <strong>2</strong> is not in the number in any spot.</p>
+            </div>
+          </div>
+          <p><strong>A new NUMBEE will be available whenever you want!</strong></p>
+        </div>
+      </div>
+    </div>
+
   </div>
 </body>
 </html>

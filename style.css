@@ -1,5 +1,6 @@
 :root{
     --num-dimension: 40px;
+    --game-width: 500px;
 }
 
 *{
@@ -20,7 +21,7 @@ body{
 .game{
     position: relative;
     width: 100%;
-    max-width: 500px;
+    max-width: var(--game-width);
     height: 100%;
     margin: 0 auto;
     display: flex;
@@ -60,6 +61,22 @@ header .n-icon{
     width: 100%;
     height: calc(100vh - 260px);
     flex-grow: 1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+}
+
+.main .main-inner{
+    width: 70%;
+    max-height: calc(100vh - 260px);
+}
+
+@media (max-width: 400px) {
+    .main .main-inner{
+        width: 70%;
+    }
 }
 
 .main .row{
@@ -73,9 +90,11 @@ header .n-icon{
 }
 
 .main .col{
-    width: var(--num-dimension);
-    height: var(--num-dimension);
+    /* width: var(--num-dimension);
+    height: var(--num-dimension); */
     padding: 4px;
+    /* aspect-ratio: 1 / 1; */
+    width: 20%;
 }
 
 .main .num{
@@ -83,7 +102,7 @@ header .n-icon{
     width: 100%;
     height: 100%;
     background-color: #fff;
-    border: 2px solid #eee;
+    border: 2px solid #d3d6d9;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -94,34 +113,22 @@ header .n-icon{
     /* transition: background-color ease 1s, border-color ease 1s; */
 }
 
-.main .col .num.controlling{
-    transition: background-color ease 1s, border-color ease 1s;
+.main .num::before {
+    display: inline-block;
+    padding-bottom: 100%;
+    content: "";
 }
 
-.main .col:nth-child(1) .num.controlling{
-    transition-delay: 0;
+@media (max-height: 500px) {
+    .main .num {
+      font-size: 20px;
+      line-height: 16px;
+    }
 }
-
-.main .col:nth-child(2) .num.controlling{
-    transition-delay: .6s;
-} 
-
-.main .col:nth-child(3) .num.controlling{
-    transition-delay: 1.2s;
-}  
-
-.main .col:nth-child(4) .num.controlling{
-    transition-delay: 1.8s;
-} 
-
-.main .col:nth-child(5) .num.controlling{
-    transition-delay: 2.4s;
-}
-
 
 .main .num.filled{
-    border-color: #949698;
-    transition-delay: 0;
+    border-color: #838689;
+    transition-delay: 0s;
 }
 
 .main .num.same{
@@ -140,6 +147,30 @@ header .n-icon{
     border-color: #6b6b6b;
     background-color: #6b6b6b;
     color: #fff;
+}
+
+.main .col .num.controlling{
+    transition: background-color ease 1s, border-color ease 1s;
+}
+
+.main .col:nth-child(1) .num.controlling{
+    transition-delay: 0s;
+}
+
+.main .col:nth-child(2) .num.controlling{
+    transition-delay: .6s;
+} 
+
+.main .col:nth-child(3) .num.controlling{
+    transition-delay: 1.2s;
+}  
+
+.main .col:nth-child(4) .num.controlling{
+    transition-delay: 1.8s;
+} 
+
+.main .col:nth-child(5) .num.controlling{
+    transition-delay: 2.4s;
 }
 
 
@@ -256,7 +287,7 @@ header .n-icon{
 
 
 
-.modal-panel{
+.sub-page{
     position: absolute;
     width: 100%;
     height: 100%;
@@ -265,42 +296,39 @@ header .n-icon{
     top: 0;
     bottom: 0;
     background-color: #fff;
-    /* transform: translateY(50px);
-    opacity: 0; */
     transition: transform ease .3s, opacity ease .3s;
     display: none;
     flex-direction: column;
     animation: SlideIn 100ms linear;
 }
 
-.modal-panel.open{
-    /* transform: translateY(0);
-    opacity: 1; */
+.sub-page.open{
     display: flex;
 }
 
-.modal-panel.closing{
+.sub-page.closing{
     animation: SlideOut 150ms linear;
 }
 
-.modal-panel .modal-title{
+.sub-page .sub-page-title{
     padding: 4px 8px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     width: 100%;
     height: 60px;
+    min-height: 60px;
     background-color: #f1f1f1;
 }
 
-.modal-panel .modal-title h2{
+.sub-page .sub-page-title h2{
     padding: 0;
     margin: 0;
     flex-grow: 1;
     text-align: center;
 }
 
-.modal-panel .modal-title .close-btn{
+.sub-page .sub-page-title .close-btn{
     padding: 4px;
     display: flex;
     background-color: transparent;
@@ -335,7 +363,7 @@ header .n-icon{
   }
 
 
-.modal-row{
+.sub-page-row{
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -343,7 +371,7 @@ header .n-icon{
     border-bottom: 1px solid #d3d6d9;
 }
 
-.modal-row .settings-detail{
+.sub-page-row .settings-detail{
     font-size: 18px;
     font-weight: 500;
 }
@@ -451,6 +479,156 @@ header .n-icon{
 
 
 
+
+.stats .guess-distribution{
+    margin-bottom: 32px;
+}
+
+.stats .guess-distribution-container{
+    width: 80%;
+    margin: 0 auto;
+    margin-bottom: 32px;
+}
+
+.stats .guess-distribution-row{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 6px;
+}
+
+.stats .guess-distribution-guess-count{
+    text-align: center;
+    width: 12px;
+}
+
+.stats .guess-distribution-graph{
+    width: 100%;
+    margin-left: 4px;
+    background: #f3f6f9;
+    border-radius: 3px;
+}
+
+.stats .guess-distribution-graph-bar{
+    background-color: #9e9e9e;
+    display: flex;
+    justify-content: flex-end;
+    padding: 3px 3px 3px 0px;
+    border-radius: 3px;
+}
+
+.stats .guess-distribution-graph-bar-value{
+    margin-left: auto;
+    color: #fff;
+    font-weight: 500;
+}
+
+
+.stats .stats-panel-container{
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.stats .stats-panel-item{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    flex-grow: 1;
+    /* border: 1px solid #e3e6e9; */
+    margin: 4px;
+    width: 25%;
+}
+
+.stats .stats-panel-item-value{
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 52px;
+    border-bottom: 1px solid #eee;
+    width: 100%;
+    text-align: center;
+}
+
+.stats .stats-panel-item-detail{
+    padding: 4px;
+    text-align: center;
+    font-size: 14px;
+    line-height: 14px;
+}
+
+
+
+.help{
+    overflow-y: auto;
+    padding: 16px;
+    max-height: calc(100% - 60px);
+    font-size: 14px;;
+}
+
+.help .examples{
+    border-top: 1px solid #d3d6d9;
+    border-bottom: 1px solid #d3d6d9;
+}
+
+.help .examples-row{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.help .examples-col{
+    padding: 4px;
+    width: 52px;
+    height: 52px;
+}
+
+.help .examples-num{
+    color: #333;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    border: 2px solid #d3d6d9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 24px;
+    user-select: none;
+}
+
+.help .examples-num.filled{
+    border-color: #838689;
+    transition-delay: 0s;
+}
+
+.help .examples-num.same{
+    border-color: #4caf50;
+    background-color: #4caf50;
+    color: #fff;
+}
+
+.help .examples-num.wrong-place{
+    border-color: #a78000;
+    background-color: #a78000;
+    color: #fff;
+}
+
+.help .examples-num.not-exist{
+    border-color: #6b6b6b;
+    background-color: #6b6b6b;
+    color: #fff;
+}
+
+
+
+
+
+
+
+
+
 body.dark{
     background-color: #232629;
 }
@@ -467,28 +645,28 @@ body.dark .game header .n-icon{
     color: #d3d6d9;
 }
 
-body.dark .modal-panel{
+body.dark .sub-page{
     background-color: #232629;
 }
 
-body.dark .modal-panel .modal-row{
+body.dark .sub-page .sub-page-row{
     border-color: #737679;
     border-color: #434649;
 }
 
-body.dark .modal-panel .modal-title{
+body.dark .sub-page .sub-page-title{
     background-color: #131619;
 }
 
-body.dark .modal-panel .modal-title .close-btn {
+body.dark .sub-page .sub-page-title .close-btn {
     color: #d3d6d9;
 }
 
-body.dark .modal-panel .modal-title h2 {
+body.dark .sub-page .sub-page-title h2 {
     color: #d3d6d9;
 }
 
-body.dark .modal-panel .modal-row .settings-detail{
+body.dark .msub-page .sub-page-row .settings-detail{
     color: #d3d6d9;
 }
 
@@ -579,3 +757,84 @@ body.dark .num-pad button.not-exist{
       transform: translateX(-3px);
     }
   }
+
+
+
+
+
+
+
+
+
+
+.modal{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, .6);
+    z-index: 2000;
+    transition: transform ease .4s;
+}
+
+.modal.open{
+    display: flex;
+}
+
+.modal .modal-panel{
+    width: 90%;
+    max-width: var(--game-width);
+    max-height: 90%;
+    margin: auto;
+    background-color: rgb(255, 255, 255);
+    border-radius: 4px;
+    box-shadow: 0 4px 20px 0px rgb(0, 0, 0, .25);
+    padding: 0 16px;
+    z-index: 2005;
+    animation: SlideIn 100ms linear;
+}
+
+.modal .modal-panel .modal-header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal .modal-panel .modal-header .modal-title{
+    flex-grow: 1;
+    margin: 16px 0;
+}
+
+.modal .modal-panel .modal-header .close-btn{
+    padding: 4px;
+    display: flex;
+    background-color: transparent;
+    border-width: 0;
+    cursor: pointer;
+    color: #737679;
+}
+
+.flex{
+    display: flex;
+}
+
+.flex-column{
+    flex-direction: column;
+}
+
+.align-center{
+    align-items: center;
+}
+
+.justify-center{
+    justify-content: center;
+}
+
+.flex-grow-1{
+    flex-grow: 1;
+}
+
